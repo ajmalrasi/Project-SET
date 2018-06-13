@@ -15,7 +15,7 @@ node {
           size: -1
         }
         dim {
-          size: 1421
+          size: 2639
         }
       }
     }
@@ -48,7 +48,7 @@ node {
             size: 2
           }
         }
-        tensor_content: "\215\005\000\000\010\000\000\000"
+        tensor_content: "O\n\000\000\010\000\000\000"
       }
     }
   }
@@ -216,7 +216,7 @@ node {
     value {
       shape {
         dim {
-          size: 1421
+          size: 2639
         }
         dim {
           size: 8
@@ -444,6 +444,17 @@ node {
     key: "data_format"
     value {
       s: "NHWC"
+    }
+  }
+}
+node {
+  name: "FullyConnected/Relu"
+  op: "Relu"
+  input: "FullyConnected/BiasAdd"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
     }
   }
 }
@@ -834,7 +845,7 @@ node {
 node {
   name: "FullyConnected_1/MatMul"
   op: "MatMul"
-  input: "FullyConnected/BiasAdd"
+  input: "FullyConnected/Relu"
   input: "FullyConnected_1/W/read"
   attr {
     key: "T"
@@ -874,6 +885,17 @@ node {
   }
 }
 node {
+  name: "FullyConnected_1/Relu"
+  op: "Relu"
+  input: "FullyConnected_1/BiasAdd"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
   name: "FullyConnected_2/W/Initializer/truncated_normal/shape"
   op: "Const"
   attr {
@@ -900,7 +922,7 @@ node {
             size: 2
           }
         }
-        tensor_content: "\010\000\000\0003\000\000\000"
+        tensor_content: "\010\000\000\000L\000\000\000"
       }
     }
   }
@@ -1071,7 +1093,7 @@ node {
           size: 8
         }
         dim {
-          size: 51
+          size: 76
         }
       }
     }
@@ -1158,7 +1180,7 @@ node {
         dtype: DT_FLOAT
         tensor_shape {
           dim {
-            size: 51
+            size: 76
           }
         }
         float_val: 0.0
@@ -1194,7 +1216,7 @@ node {
     value {
       shape {
         dim {
-          size: 51
+          size: 76
         }
       }
     }
@@ -1260,7 +1282,7 @@ node {
 node {
   name: "FullyConnected_2/MatMul"
   op: "MatMul"
-  input: "FullyConnected_1/BiasAdd"
+  input: "FullyConnected_1/Relu"
   input: "FullyConnected_2/W/read"
   attr {
     key: "T"
@@ -1327,7 +1349,7 @@ node {
           size: -1
         }
         dim {
-          size: 51
+          size: 76
         }
       }
     }
@@ -5310,7 +5332,7 @@ node {
 node {
   name: "Adam/gradients/FullyConnected_2/MatMul_grad/MatMul_1"
   op: "MatMul"
-  input: "FullyConnected_1/BiasAdd"
+  input: "FullyConnected_1/Relu"
   input: "Adam/gradients/FullyConnected_2/Softmax_grad/mul_1"
   attr {
     key: "T"
@@ -5332,9 +5354,21 @@ node {
   }
 }
 node {
+  name: "Adam/gradients/FullyConnected_1/Relu_grad/ReluGrad"
+  op: "ReluGrad"
+  input: "Adam/gradients/FullyConnected_2/MatMul_grad/MatMul"
+  input: "FullyConnected_1/Relu"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
   name: "Adam/gradients/FullyConnected_1/BiasAdd_grad/BiasAddGrad"
   op: "BiasAddGrad"
-  input: "Adam/gradients/FullyConnected_2/MatMul_grad/MatMul"
+  input: "Adam/gradients/FullyConnected_1/Relu_grad/ReluGrad"
   attr {
     key: "T"
     value {
@@ -5351,7 +5385,7 @@ node {
 node {
   name: "Adam/gradients/FullyConnected_1/MatMul_grad/MatMul"
   op: "MatMul"
-  input: "Adam/gradients/FullyConnected_2/MatMul_grad/MatMul"
+  input: "Adam/gradients/FullyConnected_1/Relu_grad/ReluGrad"
   input: "FullyConnected_1/W/read"
   attr {
     key: "T"
@@ -5375,8 +5409,8 @@ node {
 node {
   name: "Adam/gradients/FullyConnected_1/MatMul_grad/MatMul_1"
   op: "MatMul"
-  input: "FullyConnected/BiasAdd"
-  input: "Adam/gradients/FullyConnected_2/MatMul_grad/MatMul"
+  input: "FullyConnected/Relu"
+  input: "Adam/gradients/FullyConnected_1/Relu_grad/ReluGrad"
   attr {
     key: "T"
     value {
@@ -5397,9 +5431,21 @@ node {
   }
 }
 node {
+  name: "Adam/gradients/FullyConnected/Relu_grad/ReluGrad"
+  op: "ReluGrad"
+  input: "Adam/gradients/FullyConnected_1/MatMul_grad/MatMul"
+  input: "FullyConnected/Relu"
+  attr {
+    key: "T"
+    value {
+      type: DT_FLOAT
+    }
+  }
+}
+node {
   name: "Adam/gradients/FullyConnected/BiasAdd_grad/BiasAddGrad"
   op: "BiasAddGrad"
-  input: "Adam/gradients/FullyConnected_1/MatMul_grad/MatMul"
+  input: "Adam/gradients/FullyConnected/Relu_grad/ReluGrad"
   attr {
     key: "T"
     value {
@@ -5416,7 +5462,7 @@ node {
 node {
   name: "Adam/gradients/FullyConnected/MatMul_grad/MatMul"
   op: "MatMul"
-  input: "Adam/gradients/FullyConnected_1/MatMul_grad/MatMul"
+  input: "Adam/gradients/FullyConnected/Relu_grad/ReluGrad"
   input: "FullyConnected/W/read"
   attr {
     key: "T"
@@ -5441,7 +5487,7 @@ node {
   name: "Adam/gradients/FullyConnected/MatMul_grad/MatMul_1"
   op: "MatMul"
   input: "InputData/X"
-  input: "Adam/gradients/FullyConnected_1/MatMul_grad/MatMul"
+  input: "Adam/gradients/FullyConnected/Relu_grad/ReluGrad"
   attr {
     key: "T"
     value {
@@ -6331,7 +6377,7 @@ node {
         dtype: DT_FLOAT
         tensor_shape {
           dim {
-            size: 1421
+            size: 2639
           }
           dim {
             size: 8
@@ -6370,7 +6416,7 @@ node {
     value {
       shape {
         dim {
-          size: 1421
+          size: 2639
         }
         dim {
           size: 8
@@ -6460,7 +6506,7 @@ node {
         dtype: DT_FLOAT
         tensor_shape {
           dim {
-            size: 1421
+            size: 2639
           }
           dim {
             size: 8
@@ -6499,7 +6545,7 @@ node {
     value {
       shape {
         dim {
-          size: 1421
+          size: 2639
         }
         dim {
           size: 8
@@ -7342,7 +7388,7 @@ node {
             size: 8
           }
           dim {
-            size: 51
+            size: 76
           }
         }
         float_val: 0.0
@@ -7381,7 +7427,7 @@ node {
           size: 8
         }
         dim {
-          size: 51
+          size: 76
         }
       }
     }
@@ -7471,7 +7517,7 @@ node {
             size: 8
           }
           dim {
-            size: 51
+            size: 76
           }
         }
         float_val: 0.0
@@ -7510,7 +7556,7 @@ node {
           size: 8
         }
         dim {
-          size: 51
+          size: 76
         }
       }
     }
@@ -7597,7 +7643,7 @@ node {
         dtype: DT_FLOAT
         tensor_shape {
           dim {
-            size: 51
+            size: 76
           }
         }
         float_val: 0.0
@@ -7633,7 +7679,7 @@ node {
     value {
       shape {
         dim {
-          size: 51
+          size: 76
         }
       }
     }
@@ -7720,7 +7766,7 @@ node {
         dtype: DT_FLOAT
         tensor_shape {
           dim {
-            size: 51
+            size: 76
           }
         }
         float_val: 0.0
@@ -7756,7 +7802,7 @@ node {
     value {
       shape {
         dim {
-          size: 51
+          size: 76
         }
       }
     }
